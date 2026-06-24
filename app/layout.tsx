@@ -15,9 +15,18 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Uifry — Make The Best Financial Decisions",
+  title: {
+    default: "Uifry",
+    template: "%s | Uifry",
+  },
+  applicationName: "Uifry",
   description:
     "A modern finance app for smarter budgeting, clearer decisions, and total control.",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({

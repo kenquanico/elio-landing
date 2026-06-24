@@ -1,23 +1,20 @@
 import Image from "next/image";
 import Reveal from "@/components/ui/Reveal";
-import Sparkle from "@/components/ui/Sparkle";
 
 export default function CTA() {
   return (
     <section id="download" className="py-20 sm:py-28">
       <div className="page-shell">
         <Reveal className="relative min-h-[480px] overflow-hidden rounded-[28px] bg-brand-black px-7 py-14 text-white sm:px-12 lg:min-h-[510px] lg:px-20">
-          <div className="red-glow absolute -bottom-48 -left-36 h-[420px] w-[520px] opacity-45" />
           <Image
-            src="/assets/cta-stars.png"
+            src="/assets/footer-banner.png"
             alt=""
-            width={2655}
-            height={538}
+            fill
+            sizes="(max-width: 1280px) 100vw, 1240px"
+            className="object-cover object-center"
             aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 h-auto w-full opacity-90"
           />
-          <Sparkle className="absolute left-[46%] top-20 h-8 w-8 text-white" />
-          <Sparkle className="absolute bottom-8 right-8 h-6 w-6 text-white" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/45 to-transparent" />
 
           <div className="relative z-10 max-w-[560px] pt-8 lg:pt-24">
             <h2 className="font-display text-4xl font-extrabold leading-tight tracking-[-0.04em] sm:text-5xl">
@@ -41,15 +38,6 @@ export default function CTA() {
               </svg>
             </a>
           </div>
-
-          <Image
-            src="/assets/cta-phones.png"
-            alt="Uifry app screens ready to download"
-            width={2530}
-            height={1397}
-            sizes="(max-width: 1024px) 90vw, 60vw"
-            className="relative -bottom-14 -right-[15%] mt-8 h-auto w-[120%] max-w-none lg:absolute lg:-bottom-10 lg:-right-36 lg:mt-0 lg:w-[72%]"
-          />
         </Reveal>
       </div>
     </section>

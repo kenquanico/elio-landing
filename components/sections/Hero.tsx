@@ -58,24 +58,24 @@ export default function Hero() {
           </motion.div>
 
           <motion.div
-            className="relative mt-8 hidden w-[390px] sm:block"
+            className="relative -ml-4 -mt-2 hidden w-[460px] max-w-full sm:block lg:-ml-8 lg:-mt-5 lg:w-[510px]"
             initial={reduceMotion ? false : { opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.75, delay: 0.35 }}
           >
             <Image
-              src="/assets/hero-ribbon.png"
-              alt="Uifry make progress ribbon"
-              width={1404}
-              height={1796}
-              sizes="390px"
+              src="/assets/ribbon.png"
+              alt="Uifry Premium finance achievement ribbon"
+              width={569}
+              height={427}
+              sizes="(max-width: 1024px) 460px, 510px"
               className="h-auto w-full"
             />
           </motion.div>
         </div>
 
         <motion.div
-          className="relative z-0 mx-auto w-full max-w-[680px] lg:-mr-16"
+          className="relative z-10 mx-auto flex w-full max-w-[650px] items-center justify-center self-center lg:-mr-4 lg:translate-x-8"
           initial={reduceMotion ? false : { opacity: 0, x: 55, rotate: 2 }}
           animate={
             reduceMotion
