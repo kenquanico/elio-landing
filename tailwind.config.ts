@@ -8,7 +8,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        "brand-red": "#FF5555",
+        "brand-red": "#224D69",
         "brand-black": "#0A0A0A",
         "brand-white": "#FFFFFF",
         "brand-gray": "#F5F5F5",
