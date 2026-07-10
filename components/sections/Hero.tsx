@@ -92,15 +92,25 @@ function clamp(
     return Math.min(Math.max(value, minimum), maximum);
 }
 
-function smootherStep(progress: number) {
-    const value = clamp(progress, 0, 1);
+function getClosestCardIndex(
+    cards: HTMLElement[],
+    position: number,
+) {
+    let closestIndex = 0;
+    let closestDistance = Number.POSITIVE_INFINITY;
 
-    return (
-        value *
-        value *
-        value *
-        (value * (value * 6 - 15) + 10)
-    );
+    cards.forEach((card, index) => {
+        const distance = Math.abs(
+            card.offsetLeft - position,
+        );
+
+        if (distance < closestDistance) {
+            closestDistance = distance;
+            closestIndex = index;
+        }
+    });
+
+    return closestIndex;
 }
 
 function ChevronLeftIcon() {
@@ -162,7 +172,16 @@ export default function Hero() {
     const scrollEffectsFrameRef =
         useRef<number | null>(null);
 
+    const scrollTargetRef = useRef(0);
+    const scrollVelocityRef = useRef(0);
+    const scrollLastTimeRef = useRef<number | null>(null);
+    const targetCardIndexRef = useRef(0);
+    const isArrowAnimatingRef = useRef(false);
+
     const reduceMotion = useReducedMotion();
+
+    const [activeCardIndex, setActiveCardIndex] =
+        useState(0);
 
     const [scrollEdges, setScrollEdges] =
         useState<ScrollEdges>({
@@ -189,16 +208,31 @@ export default function Hero() {
         restSpeed: 0.0001,
     });
 
-    const cancelScrollAnimation = useCallback(() => {
-        if (scrollAnimationFrameRef.current === null) {
-            return;
+    const getCards = useCallback(() => {
+        const scroller = scrollerRef.current;
+
+        if (!scroller) {
+            return [];
         }
 
-        cancelAnimationFrame(
-            scrollAnimationFrameRef.current,
+        return Array.from(
+            scroller.querySelectorAll<HTMLElement>(
+                "[data-feature-card]",
+            ),
         );
+    }, []);
+
+    const cancelScrollAnimation = useCallback(() => {
+        if (scrollAnimationFrameRef.current !== null) {
+            cancelAnimationFrame(
+                scrollAnimationFrameRef.current,
+            );
+        }
 
         scrollAnimationFrameRef.current = null;
+        scrollLastTimeRef.current = null;
+        scrollVelocityRef.current = 0;
+        isArrowAnimatingRef.current = false;
     }, []);
 
     const updateScrollEffects = useCallback(() => {
@@ -224,10 +258,6 @@ export default function Hero() {
             0,
         );
 
-        /*
-         * The fade starts after the first pixel of movement.
-         * It reaches full opacity after 12 pixels.
-         */
         const fadeActivationDistance = 12;
 
         const leftStrength = clamp(
@@ -261,7 +291,26 @@ export default function Hero() {
                 right: nextRight,
             };
         });
-    }, [leftFadeTarget, rightFadeTarget]);
+
+        const cards = getCards();
+
+        if (cards.length > 0) {
+            const nextActiveIndex = getClosestCardIndex(
+                cards,
+                currentScroll,
+            );
+
+            setActiveCardIndex((currentIndex) =>
+                currentIndex === nextActiveIndex
+                    ? currentIndex
+                    : nextActiveIndex,
+            );
+        }
+    }, [
+        getCards,
+        leftFadeTarget,
+        rightFadeTarget,
+    ]);
 
     const scheduleScrollEffectsUpdate =
         useCallback(() => {
@@ -284,8 +333,6 @@ export default function Hero() {
                 return;
             }
 
-            cancelScrollAnimation();
-
             const maximumScroll = Math.max(
                 scroller.scrollWidth - scroller.clientWidth,
                 0,
@@ -297,55 +344,110 @@ export default function Hero() {
                 maximumScroll,
             );
 
-            const startPosition = scroller.scrollLeft;
-            const distance = target - startPosition;
+            scrollTargetRef.current = target;
 
-            if (
-                reduceMotion ||
-                Math.abs(distance) < 0.5
-            ) {
+            if (reduceMotion) {
+                cancelScrollAnimation();
                 scroller.scrollLeft = target;
                 updateScrollEffects();
                 return;
             }
 
-            const duration = clamp(
-                900 + Math.abs(distance) * 0.34,
-                980,
-                1280,
-            );
+            /*
+             * When another arrow is pressed during movement,
+             * update the target without restarting the animation.
+             */
+            if (isArrowAnimatingRef.current) {
+                return;
+            }
 
-            const startTime = performance.now();
+            isArrowAnimatingRef.current = true;
+            scrollVelocityRef.current = 0;
+            scrollLastTimeRef.current = performance.now();
+
+            const springStiffness = 58;
+            const springDamping = 15.5;
+            const maximumVelocity = 1800;
 
             const animate = (currentTime: number) => {
-                const elapsed = currentTime - startTime;
+                const activeScroller = scrollerRef.current;
 
-                const progress = clamp(
-                    elapsed / duration,
-                    0,
-                    1,
-                );
-
-                const easedProgress =
-                    smootherStep(progress);
-
-                scroller.scrollLeft =
-                    startPosition +
-                    distance * easedProgress;
-
-                updateScrollEffects();
-
-                if (progress < 1) {
-                    scrollAnimationFrameRef.current =
-                        requestAnimationFrame(animate);
-
+                if (!activeScroller) {
+                    cancelScrollAnimation();
                     return;
                 }
 
-                scroller.scrollLeft = target;
-                scrollAnimationFrameRef.current = null;
+                const previousTime =
+                    scrollLastTimeRef.current ?? currentTime;
 
+                const deltaTime = clamp(
+                    (currentTime - previousTime) / 1000,
+                    1 / 240,
+                    1 / 30,
+                );
+
+                scrollLastTimeRef.current = currentTime;
+
+                const currentPosition =
+                    activeScroller.scrollLeft;
+
+                const activeTarget =
+                    scrollTargetRef.current;
+
+                const displacement =
+                    activeTarget - currentPosition;
+
+                const acceleration =
+                    displacement * springStiffness -
+                    scrollVelocityRef.current *
+                    springDamping;
+
+                scrollVelocityRef.current = clamp(
+                    scrollVelocityRef.current +
+                    acceleration * deltaTime,
+                    -maximumVelocity,
+                    maximumVelocity,
+                );
+
+                const nextPosition = clamp(
+                    currentPosition +
+                    scrollVelocityRef.current * deltaTime,
+                    0,
+                    Math.max(
+                        activeScroller.scrollWidth -
+                        activeScroller.clientWidth,
+                        0,
+                    ),
+                );
+
+                activeScroller.scrollLeft = nextPosition;
                 updateScrollEffects();
+
+                const remainingDistance = Math.abs(
+                    activeTarget - nextPosition,
+                );
+
+                const remainingVelocity = Math.abs(
+                    scrollVelocityRef.current,
+                );
+
+                if (
+                    remainingDistance < 0.35 &&
+                    remainingVelocity < 2.5
+                ) {
+                    activeScroller.scrollLeft = activeTarget;
+
+                    scrollVelocityRef.current = 0;
+                    scrollLastTimeRef.current = null;
+                    scrollAnimationFrameRef.current = null;
+                    isArrowAnimatingRef.current = false;
+
+                    updateScrollEffects();
+                    return;
+                }
+
+                scrollAnimationFrameRef.current =
+                    requestAnimationFrame(animate);
             };
 
             scrollAnimationFrameRef.current =
@@ -361,49 +463,37 @@ export default function Hero() {
     const scrollByCard = useCallback(
         (direction: 1 | -1) => {
             const scroller = scrollerRef.current;
+            const cards = getCards();
 
-            if (!scroller) {
+            if (!scroller || cards.length === 0) {
                 return;
             }
 
-            const cards = Array.from(
-                scroller.querySelectorAll<HTMLElement>(
-                    "[data-feature-card]",
-                ),
-            );
-
-            if (cards.length === 0) {
-                return;
-            }
-
-            const currentPosition = scroller.scrollLeft;
-
-            let closestIndex = 0;
-            let closestDistance =
-                Number.POSITIVE_INFINITY;
-
-            cards.forEach((card, index) => {
-                const distance = Math.abs(
-                    card.offsetLeft - currentPosition,
+            /*
+             * During an existing arrow animation, move from the
+             * current target index instead of the current position.
+             * This keeps repeated clicks fluid.
+             */
+            const baseIndex = isArrowAnimatingRef.current
+                ? targetCardIndexRef.current
+                : getClosestCardIndex(
+                    cards,
+                    scroller.scrollLeft,
                 );
 
-                if (distance < closestDistance) {
-                    closestDistance = distance;
-                    closestIndex = index;
-                }
-            });
-
             const targetIndex = clamp(
-                closestIndex + direction,
+                baseIndex + direction,
                 0,
                 cards.length - 1,
             );
+
+            targetCardIndexRef.current = targetIndex;
 
             animateScrollTo(
                 cards[targetIndex].offsetLeft,
             );
         },
-        [animateScrollTo],
+        [animateScrollTo, getCards],
     );
 
     useEffect(() => {
@@ -413,12 +503,28 @@ export default function Hero() {
             return;
         }
 
+        const syncTargetToCurrentCard = () => {
+            const cards = getCards();
+
+            if (cards.length === 0) {
+                return;
+            }
+
+            targetCardIndexRef.current =
+                getClosestCardIndex(
+                    cards,
+                    scroller.scrollLeft,
+                );
+        };
+
         const handleManualInteraction = () => {
             cancelScrollAnimation();
+            syncTargetToCurrentCard();
         };
 
         const resizeObserver = new ResizeObserver(() => {
             scheduleScrollEffectsUpdate();
+            syncTargetToCurrentCard();
         });
 
         scroller.addEventListener(
@@ -463,6 +569,7 @@ export default function Hero() {
         const initialFrame =
             requestAnimationFrame(() => {
                 updateScrollEffects();
+                syncTargetToCurrentCard();
             });
 
         return () => {
@@ -504,6 +611,7 @@ export default function Hero() {
         };
     }, [
         cancelScrollAnimation,
+        getCards,
         scheduleScrollEffectsUpdate,
         updateScrollEffects,
     ]);
@@ -942,21 +1050,26 @@ export default function Hero() {
                   "
                                 >
                                     <article
-                                        className="
+                                        className={`
                       group relative grid h-full
                       grid-rows-[296px_304px]
                       overflow-hidden
                       rounded-[30px]
                       bg-white
                       shadow-[0_2px_8px_rgba(0,0,0,0.025)]
-                      transition-all
-                      duration-[900ms]
+                      transition-[transform,opacity,box-shadow]
+                      duration-[850ms]
                       ease-[cubic-bezier(0.16,1,0.3,1)]
                       hover:-translate-y-1
                       hover:shadow-[0_16px_45px_-30px_rgba(0,0,0,0.28)]
                       sm:grid-rows-[304px_326px]
                       lg:grid-rows-[312px_348px]
-                    "
+                      ${
+                                            index === activeCardIndex
+                                                ? "translate-y-0 scale-100 opacity-100"
+                                                : "translate-y-[2px] scale-[0.992] opacity-[0.965]"
+                                        }
+                    `}
                                     >
                                         <div className="relative z-10 px-7 pt-8 sm:px-8 sm:pt-9">
                                             <p className="text-[15px] font-semibold leading-none text-[#1d1d1f]">
@@ -1232,63 +1345,75 @@ export default function Hero() {
                         </a>
 
                         <div className="flex items-center gap-3">
-                            <button
+                            <motion.button
                                 type="button"
                                 aria-label="Previous Elio feature"
                                 onClick={() => scrollByCard(-1)}
                                 disabled={!scrollEdges.left}
+                                whileTap={
+                                    scrollEdges.left
+                                        ? { scale: 0.9 }
+                                        : undefined
+                                }
+                                transition={{
+                                    type: "spring",
+                                    stiffness: 420,
+                                    damping: 28,
+                                }}
                                 className="
                   grid h-11 w-11
                   place-items-center
                   rounded-full
                   bg-[#e8e8ed]
                   text-[#6e6e73]
-                  transition-all
+                  transition-[background-color,color,opacity]
                   duration-300
-                  ease-[cubic-bezier(0.16,1,0.3,1)]
-                  hover:scale-105
                   hover:bg-[#d2d2d7]
                   hover:text-[#1d1d1f]
-                  active:scale-95
                   disabled:cursor-default
                   disabled:opacity-35
-                  disabled:hover:scale-100
                   focus-visible:outline-none
                   focus-visible:ring-2
                   focus-visible:ring-[#0071e3]
                 "
                             >
                                 <ChevronLeftIcon />
-                            </button>
+                            </motion.button>
 
-                            <button
+                            <motion.button
                                 type="button"
                                 aria-label="Next Elio feature"
                                 onClick={() => scrollByCard(1)}
                                 disabled={!scrollEdges.right}
+                                whileTap={
+                                    scrollEdges.right
+                                        ? { scale: 0.9 }
+                                        : undefined
+                                }
+                                transition={{
+                                    type: "spring",
+                                    stiffness: 420,
+                                    damping: 28,
+                                }}
                                 className="
                   grid h-11 w-11
                   place-items-center
                   rounded-full
                   bg-[#e8e8ed]
                   text-[#6e6e73]
-                  transition-all
+                  transition-[background-color,color,opacity]
                   duration-300
-                  ease-[cubic-bezier(0.16,1,0.3,1)]
-                  hover:scale-105
                   hover:bg-[#d2d2d7]
                   hover:text-[#1d1d1f]
-                  active:scale-95
                   disabled:cursor-default
                   disabled:opacity-35
-                  disabled:hover:scale-100
                   focus-visible:outline-none
                   focus-visible:ring-2
                   focus-visible:ring-[#0071e3]
                 "
                             >
                                 <ChevronRightIcon />
-                            </button>
+                            </motion.button>
                         </div>
                     </motion.div>
                 </motion.div>
