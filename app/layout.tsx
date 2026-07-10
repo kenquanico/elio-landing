@@ -26,27 +26,20 @@ export const metadata: Metadata = {
 
     description:
         "Your personal health companion for managing medications, health records, insurance, reminders, and everyday health tasks.",
-
     icons: {
         icon: [
             {
-                url: `/Elio_New.png?v=${iconVersion}`,
+                url: "/Elio_New.png?v=4",
                 type: "image/png",
+                sizes: "1024x1024",
             },
         ],
-
-        shortcut: [
-            {
-                url: `/Elio_New.png?v=${iconVersion}`,
-                type: "image/png",
-            },
-        ],
-
+        shortcut: "/Elio_New.png?v=4",
         apple: [
             {
-                url: `/Elio_New.png?v=${iconVersion}`,
+                url: "/Elio_New.png?v=4",
                 type: "image/png",
-                sizes: "180x180",
+                sizes: "1024x1024",
             },
         ],
     },
