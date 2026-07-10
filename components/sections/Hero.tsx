@@ -76,7 +76,13 @@ const FEATURES: FeatureCard[] = [
     },
 ];
 
-const ENTRANCE_EASE = [0.16, 1, 0.3, 1] as const;
+const INTRO_EASE: [number, number, number, number] = [
+    0.16, 1, 0.3, 1,
+];
+
+const SOFT_EASE: [number, number, number, number] = [
+    0.22, 1, 0.36, 1,
+];
 
 function clamp(
     value: number,
@@ -164,25 +170,21 @@ export default function Hero() {
             right: true,
         });
 
-    /*
-     * The fade reaches full opacity after only 8 pixels.
-     * This makes it appear almost immediately when dragging.
-     */
     const leftFadeTarget = useMotionValue(0);
     const rightFadeTarget = useMotionValue(1);
 
     const leftFadeOpacity = useSpring(leftFadeTarget, {
-        stiffness: 145,
-        damping: 27,
-        mass: 0.7,
+        stiffness: 90,
+        damping: 25,
+        mass: 0.82,
         restDelta: 0.0001,
         restSpeed: 0.0001,
     });
 
     const rightFadeOpacity = useSpring(rightFadeTarget, {
-        stiffness: 145,
-        damping: 27,
-        mass: 0.7,
+        stiffness: 90,
+        damping: 25,
+        mass: 0.82,
         restDelta: 0.0001,
         restSpeed: 0.0001,
     });
@@ -211,9 +213,10 @@ export default function Hero() {
             0,
         );
 
-        const currentScroll = Math.max(
+        const currentScroll = clamp(
             scroller.scrollLeft,
             0,
+            maximumScroll,
         );
 
         const remainingScroll = Math.max(
@@ -222,10 +225,10 @@ export default function Hero() {
         );
 
         /*
-         * Fade becomes visible after the first tiny movement.
-         * It reaches full strength at 8 pixels.
+         * The fade starts after the first pixel of movement.
+         * It reaches full opacity after 12 pixels.
          */
-        const fadeActivationDistance = 8;
+        const fadeActivationDistance = 12;
 
         const leftStrength = clamp(
             currentScroll / fadeActivationDistance,
@@ -306,14 +309,10 @@ export default function Hero() {
                 return;
             }
 
-            /*
-             * A longer duration with smootherStep gives the cards
-             * a soft Apple-style acceleration and deceleration.
-             */
             const duration = clamp(
-                780 + Math.abs(distance) * 0.32,
-                880,
-                1180,
+                900 + Math.abs(distance) * 0.34,
+                980,
+                1280,
             );
 
             const startTime = performance.now();
@@ -380,7 +379,8 @@ export default function Hero() {
             const currentPosition = scroller.scrollLeft;
 
             let closestIndex = 0;
-            let closestDistance = Number.POSITIVE_INFINITY;
+            let closestDistance =
+                Number.POSITIVE_INFINITY;
 
             cards.forEach((card, index) => {
                 const distance = Math.abs(
@@ -460,13 +460,13 @@ export default function Hero() {
 
         resizeObserver.observe(scroller);
 
-        const initialUpdateFrame =
+        const initialFrame =
             requestAnimationFrame(() => {
                 updateScrollEffects();
             });
 
         return () => {
-            cancelAnimationFrame(initialUpdateFrame);
+            cancelAnimationFrame(initialFrame);
             cancelScrollAnimation();
 
             if (scrollEffectsFrameRef.current !== null) {
@@ -517,25 +517,37 @@ export default function Hero() {
                     ? false
                     : {
                         opacity: 0,
-                        filter: "blur(20px)",
+                        y: 24,
+                        scale: 0.992,
+                        filter: "blur(30px)",
                     }
             }
             whileInView={{
                 opacity: 1,
+                y: 0,
+                scale: 1,
                 filter: "blur(0px)",
             }}
             viewport={{
                 once: true,
-                amount: 0.08,
+                amount: 0.06,
             }}
             transition={{
                 opacity: {
-                    duration: 0.8,
-                    ease: ENTRANCE_EASE,
+                    duration: 1.6,
+                    ease: INTRO_EASE,
                 },
                 filter: {
-                    duration: 1.15,
-                    ease: ENTRANCE_EASE,
+                    duration: 2.25,
+                    ease: INTRO_EASE,
+                },
+                y: {
+                    duration: 1.9,
+                    ease: INTRO_EASE,
+                },
+                scale: {
+                    duration: 2.1,
+                    ease: INTRO_EASE,
                 },
             }}
             className="
@@ -553,35 +565,78 @@ export default function Hero() {
                         ? false
                         : {
                             opacity: 0,
-                            scale: 0.82,
-                            filter: "blur(60px)",
+                            scale: 0.65,
+                            filter: "blur(100px)",
                         }
                 }
                 whileInView={{
-                    opacity: 1,
+                    opacity: 0.9,
                     scale: 1,
-                    filter: "blur(40px)",
+                    filter: "blur(54px)",
                 }}
                 viewport={{
                     once: true,
-                    amount: 0.08,
+                    amount: 0.06,
                 }}
                 transition={{
-                    duration: 1.35,
-                    ease: ENTRANCE_EASE,
+                    opacity: {
+                        duration: 2.2,
+                        ease: INTRO_EASE,
+                    },
+                    scale: {
+                        duration: 2.5,
+                        ease: INTRO_EASE,
+                    },
+                    filter: {
+                        duration: 2.6,
+                        ease: INTRO_EASE,
+                    },
                 }}
                 className="
           pointer-events-none
-          absolute left-1/2 top-0
-          h-[360px] w-[70vw]
-          max-w-[1000px]
+          absolute left-1/2 top-[-120px]
+          h-[460px] w-[82vw]
+          max-w-[1180px]
           -translate-x-1/2
           rounded-full
-          bg-white/70
+          bg-white/85
         "
             />
 
-            <div className="relative mx-auto max-w-[1600px] px-5 sm:px-8 lg:px-12">
+            <motion.div
+                aria-hidden="true"
+                initial={
+                    reduceMotion
+                        ? false
+                        : {
+                            opacity: 0.7,
+                            filter: "blur(20px)",
+                        }
+                }
+                whileInView={{
+                    opacity: 0,
+                    filter: "blur(70px)",
+                }}
+                viewport={{
+                    once: true,
+                    amount: 0.06,
+                }}
+                transition={{
+                    duration: 2.1,
+                    delay: 0.05,
+                    ease: SOFT_EASE,
+                }}
+                className="
+          pointer-events-none
+          absolute inset-0 z-40
+          bg-gradient-to-b
+          from-white/80
+          via-white/35
+          to-transparent
+        "
+            />
+
+            <div className="relative z-10 mx-auto max-w-[1600px] px-5 sm:px-8 lg:px-12">
                 <div className="mb-10 flex items-end justify-between gap-8 sm:mb-12 lg:mb-14">
                     <motion.div
                         initial={
@@ -589,9 +644,9 @@ export default function Hero() {
                                 ? false
                                 : {
                                     opacity: 0,
-                                    y: 28,
-                                    scale: 0.975,
-                                    filter: "blur(16px)",
+                                    y: 34,
+                                    scale: 0.97,
+                                    filter: "blur(24px)",
                                 }
                         }
                         whileInView={{
@@ -602,12 +657,29 @@ export default function Hero() {
                         }}
                         viewport={{
                             once: true,
-                            amount: 0.4,
+                            amount: 0.32,
                         }}
                         transition={{
-                            duration: 1,
-                            delay: 0.08,
-                            ease: ENTRANCE_EASE,
+                            opacity: {
+                                duration: 1.35,
+                                delay: 0.18,
+                                ease: INTRO_EASE,
+                            },
+                            filter: {
+                                duration: 1.95,
+                                delay: 0.12,
+                                ease: INTRO_EASE,
+                            },
+                            y: {
+                                duration: 1.65,
+                                delay: 0.12,
+                                ease: INTRO_EASE,
+                            },
+                            scale: {
+                                duration: 1.85,
+                                delay: 0.12,
+                                ease: INTRO_EASE,
+                            },
                         }}
                         className="
               flex min-w-0 items-start
@@ -616,21 +688,48 @@ export default function Hero() {
               lg:gap-6
             "
                     >
-                        <Image
-                            src="/elio-land.svg"
-                            alt="Elio"
-                            width={220}
-                            height={58}
-                            priority
-                            draggable={false}
-                            className="
-                mt-[1px]
-                h-[38px] w-auto shrink-0
-                select-none object-contain
-                sm:h-[48px]
-                lg:h-[58px]
-              "
-                        />
+                        <motion.div
+                            initial={
+                                reduceMotion
+                                    ? false
+                                    : {
+                                        opacity: 0,
+                                        x: -18,
+                                        filter: "blur(18px)",
+                                    }
+                            }
+                            whileInView={{
+                                opacity: 1,
+                                x: 0,
+                                filter: "blur(0px)",
+                            }}
+                            viewport={{
+                                once: true,
+                                amount: 0.32,
+                            }}
+                            transition={{
+                                duration: 1.65,
+                                delay: 0.22,
+                                ease: INTRO_EASE,
+                            }}
+                            className="shrink-0"
+                        >
+                            <Image
+                                src="/elio-land.svg"
+                                alt="Elio"
+                                width={220}
+                                height={58}
+                                priority
+                                draggable={false}
+                                className="
+                  mt-[1px]
+                  h-[38px] w-auto
+                  select-none object-contain
+                  sm:h-[48px]
+                  lg:h-[58px]
+                "
+                            />
+                        </motion.div>
 
                         <h1
                             id="elio-features-heading"
@@ -656,8 +755,8 @@ export default function Hero() {
                                 ? false
                                 : {
                                     opacity: 0,
-                                    x: 18,
-                                    filter: "blur(10px)",
+                                    x: 20,
+                                    filter: "blur(16px)",
                                 }
                         }
                         whileInView={{
@@ -667,12 +766,24 @@ export default function Hero() {
                         }}
                         viewport={{
                             once: true,
-                            amount: 0.4,
+                            amount: 0.32,
                         }}
                         transition={{
-                            duration: 0.9,
-                            delay: 0.25,
-                            ease: ENTRANCE_EASE,
+                            opacity: {
+                                duration: 1.25,
+                                delay: 0.5,
+                                ease: INTRO_EASE,
+                            },
+                            filter: {
+                                duration: 1.7,
+                                delay: 0.38,
+                                ease: INTRO_EASE,
+                            },
+                            x: {
+                                duration: 1.5,
+                                delay: 0.38,
+                                ease: INTRO_EASE,
+                            },
                         }}
                         className="
               hidden shrink-0 items-center
@@ -701,23 +812,42 @@ export default function Hero() {
                             ? false
                             : {
                                 opacity: 0,
-                                y: 34,
-                                filter: "blur(18px)",
+                                y: 48,
+                                scale: 0.975,
+                                filter: "blur(26px)",
                             }
                     }
                     whileInView={{
                         opacity: 1,
                         y: 0,
+                        scale: 1,
                         filter: "blur(0px)",
                     }}
                     viewport={{
                         once: true,
-                        amount: 0.08,
+                        amount: 0.06,
                     }}
                     transition={{
-                        duration: 1.05,
-                        delay: 0.16,
-                        ease: ENTRANCE_EASE,
+                        opacity: {
+                            duration: 1.45,
+                            delay: 0.35,
+                            ease: INTRO_EASE,
+                        },
+                        filter: {
+                            duration: 2.05,
+                            delay: 0.25,
+                            ease: INTRO_EASE,
+                        },
+                        y: {
+                            duration: 1.8,
+                            delay: 0.25,
+                            ease: INTRO_EASE,
+                        },
+                        scale: {
+                            duration: 1.95,
+                            delay: 0.25,
+                            ease: INTRO_EASE,
+                        },
                     }}
                 >
                     <div className="relative">
@@ -749,9 +879,9 @@ export default function Hero() {
                                             ? false
                                             : {
                                                 opacity: 0,
-                                                y: 44,
-                                                scale: 0.955,
-                                                filter: "blur(18px)",
+                                                y: 52,
+                                                scale: 0.94,
+                                                filter: "blur(24px)",
                                             }
                                     }
                                     whileInView={{
@@ -762,15 +892,42 @@ export default function Hero() {
                                     }}
                                     viewport={{
                                         once: true,
-                                        amount: 0.08,
-                                        margin: "0px 100px 0px 100px",
+                                        amount: 0.06,
+                                        margin: "0px 80px 0px 80px",
                                     }}
                                     transition={{
-                                        duration: 0.95,
-                                        delay: reduceMotion
-                                            ? 0
-                                            : 0.22 + index * 0.075,
-                                        ease: ENTRANCE_EASE,
+                                        opacity: {
+                                            duration: 1.25,
+                                            delay:
+                                                index < 3
+                                                    ? 0.5 + index * 0.12
+                                                    : 0.08,
+                                            ease: INTRO_EASE,
+                                        },
+                                        filter: {
+                                            duration: 1.8,
+                                            delay:
+                                                index < 3
+                                                    ? 0.38 + index * 0.12
+                                                    : 0,
+                                            ease: INTRO_EASE,
+                                        },
+                                        y: {
+                                            duration: 1.55,
+                                            delay:
+                                                index < 3
+                                                    ? 0.38 + index * 0.12
+                                                    : 0,
+                                            ease: INTRO_EASE,
+                                        },
+                                        scale: {
+                                            duration: 1.7,
+                                            delay:
+                                                index < 3
+                                                    ? 0.38 + index * 0.12
+                                                    : 0,
+                                            ease: INTRO_EASE,
+                                        },
                                     }}
                                     className="
                     h-[600px]
@@ -791,11 +948,12 @@ export default function Hero() {
                       overflow-hidden
                       rounded-[30px]
                       bg-white
-                      shadow-[0_1px_2px_rgba(0,0,0,0.02)]
-                      transition-transform
-                      duration-700
+                      shadow-[0_2px_8px_rgba(0,0,0,0.025)]
+                      transition-all
+                      duration-[900ms]
                       ease-[cubic-bezier(0.16,1,0.3,1)]
                       hover:-translate-y-1
+                      hover:shadow-[0_16px_45px_-30px_rgba(0,0,0,0.28)]
                       sm:grid-rows-[304px_326px]
                       lg:grid-rows-[312px_348px]
                     "
@@ -846,7 +1004,7 @@ export default function Hero() {
                           shadow-[0_18px_45px_-24px_rgba(0,0,0,0.45)]
                           ring-1 ring-black/10
                           transition-transform
-                          duration-[900ms]
+                          duration-[1100ms]
                           ease-[cubic-bezier(0.16,1,0.3,1)]
                           group-hover:scale-[1.018]
                           sm:w-[300px]
@@ -856,7 +1014,7 @@ export default function Hero() {
                         "
                                             >
                                                 <Image
-                                                    src={encodeURI(feature.image)}
+                                                    src={feature.image}
                                                     alt={feature.alt}
                                                     fill
                                                     priority
@@ -873,7 +1031,7 @@ export default function Hero() {
                             object-cover
                             object-top
                             transition-transform
-                            duration-[1100ms]
+                            duration-[1300ms]
                             ease-[cubic-bezier(0.16,1,0.3,1)]
                             group-hover:scale-[1.008]
                           "
@@ -920,31 +1078,31 @@ export default function Hero() {
                             className="
                 pointer-events-none
                 absolute inset-y-0 left-0 z-30
-                w-[100px]
+                w-[110px]
                 overflow-hidden
-                sm:w-[160px]
-                lg:w-[230px]
+                sm:w-[170px]
+                lg:w-[240px]
               "
                         >
                             <div
                                 className="
                   absolute inset-0
-                  bg-[linear-gradient(90deg,#f5f5f7_0%,rgba(245,245,247,0.99)_16%,rgba(245,245,247,0.94)_32%,rgba(245,245,247,0.78)_50%,rgba(245,245,247,0.48)_68%,rgba(245,245,247,0.18)_84%,transparent_100%)]
-                  backdrop-blur-[14px]
-                  [-webkit-mask-image:linear-gradient(to_right,black_0%,black_56%,transparent_100%)]
-                  [mask-image:linear-gradient(to_right,black_0%,black_56%,transparent_100%)]
+                  bg-[linear-gradient(90deg,#f5f5f7_0%,rgba(245,245,247,0.99)_14%,rgba(245,245,247,0.95)_30%,rgba(245,245,247,0.82)_48%,rgba(245,245,247,0.56)_66%,rgba(245,245,247,0.24)_82%,transparent_100%)]
+                  backdrop-blur-[15px]
+                  [-webkit-mask-image:linear-gradient(to_right,black_0%,black_58%,transparent_100%)]
+                  [mask-image:linear-gradient(to_right,black_0%,black_58%,transparent_100%)]
                 "
                             />
 
                             <div
                                 className="
                   absolute inset-y-0 left-0
-                  w-[72%]
+                  w-[74%]
                   bg-gradient-to-r
                   from-[#f5f5f7]
                   via-[#f5f5f7]/80
                   to-transparent
-                  backdrop-blur-[26px]
+                  backdrop-blur-[28px]
                   [-webkit-mask-image:linear-gradient(to_right,black_0%,transparent_100%)]
                   [mask-image:linear-gradient(to_right,black_0%,transparent_100%)]
                 "
@@ -953,9 +1111,9 @@ export default function Hero() {
                             <div
                                 className="
                   absolute inset-y-0 left-0
-                  w-[40%]
-                  bg-[#f5f5f7]/90
-                  backdrop-blur-[38px]
+                  w-[42%]
+                  bg-[#f5f5f7]/92
+                  backdrop-blur-[42px]
                   [-webkit-mask-image:linear-gradient(to_right,black_0%,transparent_100%)]
                   [mask-image:linear-gradient(to_right,black_0%,transparent_100%)]
                 "
@@ -970,31 +1128,31 @@ export default function Hero() {
                             className="
                 pointer-events-none
                 absolute inset-y-0 right-0 z-30
-                w-[100px]
+                w-[110px]
                 overflow-hidden
-                sm:w-[160px]
-                lg:w-[230px]
+                sm:w-[170px]
+                lg:w-[240px]
               "
                         >
                             <div
                                 className="
                   absolute inset-0
-                  bg-[linear-gradient(270deg,#f5f5f7_0%,rgba(245,245,247,0.99)_16%,rgba(245,245,247,0.94)_32%,rgba(245,245,247,0.78)_50%,rgba(245,245,247,0.48)_68%,rgba(245,245,247,0.18)_84%,transparent_100%)]
-                  backdrop-blur-[14px]
-                  [-webkit-mask-image:linear-gradient(to_left,black_0%,black_56%,transparent_100%)]
-                  [mask-image:linear-gradient(to_left,black_0%,black_56%,transparent_100%)]
+                  bg-[linear-gradient(270deg,#f5f5f7_0%,rgba(245,245,247,0.99)_14%,rgba(245,245,247,0.95)_30%,rgba(245,245,247,0.82)_48%,rgba(245,245,247,0.56)_66%,rgba(245,245,247,0.24)_82%,transparent_100%)]
+                  backdrop-blur-[15px]
+                  [-webkit-mask-image:linear-gradient(to_left,black_0%,black_58%,transparent_100%)]
+                  [mask-image:linear-gradient(to_left,black_0%,black_58%,transparent_100%)]
                 "
                             />
 
                             <div
                                 className="
                   absolute inset-y-0 right-0
-                  w-[72%]
+                  w-[74%]
                   bg-gradient-to-l
                   from-[#f5f5f7]
                   via-[#f5f5f7]/80
                   to-transparent
-                  backdrop-blur-[26px]
+                  backdrop-blur-[28px]
                   [-webkit-mask-image:linear-gradient(to_left,black_0%,transparent_100%)]
                   [mask-image:linear-gradient(to_left,black_0%,transparent_100%)]
                 "
@@ -1003,9 +1161,9 @@ export default function Hero() {
                             <div
                                 className="
                   absolute inset-y-0 right-0
-                  w-[40%]
-                  bg-[#f5f5f7]/90
-                  backdrop-blur-[38px]
+                  w-[42%]
+                  bg-[#f5f5f7]/92
+                  backdrop-blur-[42px]
                   [-webkit-mask-image:linear-gradient(to_left,black_0%,transparent_100%)]
                   [mask-image:linear-gradient(to_left,black_0%,transparent_100%)]
                 "
@@ -1019,8 +1177,8 @@ export default function Hero() {
                                 ? false
                                 : {
                                     opacity: 0,
-                                    y: 16,
-                                    filter: "blur(10px)",
+                                    y: 20,
+                                    filter: "blur(14px)",
                                 }
                         }
                         whileInView={{
@@ -1030,12 +1188,24 @@ export default function Hero() {
                         }}
                         viewport={{
                             once: true,
-                            amount: 0.2,
+                            amount: 0.16,
                         }}
                         transition={{
-                            duration: 0.85,
-                            delay: 0.48,
-                            ease: ENTRANCE_EASE,
+                            opacity: {
+                                duration: 1.2,
+                                delay: 0.85,
+                                ease: INTRO_EASE,
+                            },
+                            filter: {
+                                duration: 1.6,
+                                delay: 0.72,
+                                ease: INTRO_EASE,
+                            },
+                            y: {
+                                duration: 1.45,
+                                delay: 0.72,
+                                ease: INTRO_EASE,
+                            },
                         }}
                         className="mt-6 flex items-center justify-between sm:justify-end"
                     >
