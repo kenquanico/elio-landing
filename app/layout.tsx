@@ -14,32 +14,48 @@ const jakarta = Plus_Jakarta_Sans({
     display: "swap",
 });
 
-const iconVersion = "3";
+const iconVersion = "4";
 
 export const metadata: Metadata = {
     title: {
-        default: "Elio",
+        default: "Elio - Your Offline-First Health Companion",
         template: "%s | Elio",
     },
 
     applicationName: "Elio",
 
     description:
-        "Your personal health companion for managing medications, health records, insurance, reminders, and everyday health tasks.",
+        "Manage medications, health records, insurance, reminders, and everyday health tasks with Elio.",
+
     icons: {
         icon: [
             {
-                url: "/Elio_New.png?v=4",
+                url: `/Elio_New.png?v=${iconVersion}`,
                 type: "image/png",
                 sizes: "1024x1024",
             },
         ],
-        shortcut: "/Elio_New.png?v=4",
+
+        shortcut: [
+            {
+                url: `/Elio_New.png?v=${iconVersion}`,
+                type: "image/png",
+            },
+        ],
+
         apple: [
             {
-                url: "/Elio_New.png?v=4",
+                url: `/Elio_New.png?v=${iconVersion}`,
                 type: "image/png",
-                sizes: "1024x1024",
+                sizes: "180x180",
+            },
+        ],
+
+        other: [
+            {
+                rel: "mask-icon",
+                url: "/elio-land.svg",
+                color: "#062541",
             },
         ],
     },
@@ -64,32 +80,6 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" className="scroll-smooth">
-        <head>
-            <link
-                rel="icon"
-                type="image/png"
-                href={`/Elio_New.png?v=${iconVersion}`}
-            />
-
-            <link
-                rel="shortcut icon"
-                type="image/png"
-                href={`/Elio_New.png?v=${iconVersion}`}
-            />
-
-            <link
-                rel="apple-touch-icon"
-                sizes="180x180"
-                href={`/Elio_New.png?v=${iconVersion}`}
-            />
-
-            <link
-                rel="mask-icon"
-                href="/elio-land.svg"
-                color="#062541"
-            />
-        </head>
-
         <body className={`${inter.variable} ${jakarta.variable}`}>
         {children}
         </body>
