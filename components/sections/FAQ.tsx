@@ -6,28 +6,28 @@ import Reveal from "@/components/ui/Reveal";
 
 const faqs = [
   {
-    title: "The Best Financial Accounting App Ever!",
-    body: "Arcu at dictum sapien, mollis. Vulputate sit id accumsan, ultricies. In ultrices malesuada elit mauris etiam odio.",
+    title: "Does Elio Work Without Internet?",
+    body: "Elio follows an offline-first approach. Your saved medications, records, insurance information, and profile details remain accessible on your device.",
   },
   {
-    title: "How Does Uifry Keep My Data Safe?",
-    body: "Your financial data is protected with industry-standard encryption and clear privacy controls that keep you in charge.",
+    title: "What Health Information Can I Store?",
+    body: "You can organize medications, prescriptions, laboratory results, insurance records, health documents, allergies, conditions, and emergency details.",
   },
   {
-    title: "Can I Connect Multiple Bank Accounts?",
-    body: "Yes. Bring your accounts into one clear view, organize activity, and follow your goals without jumping between apps.",
+    title: "Can I Save My PhilHealth Information?",
+    body: "Yes. Elio supports PhilHealth details alongside private health insurance, life insurance, and other coverage records.",
   },
   {
-    title: "The Best Financial Accounting App Ever!",
-    body: "Track budgets, recurring expenses, and financial progress through an interface designed to stay simple as your needs grow.",
+    title: "Does Elio Replace My Doctor?",
+    body: "No. Elio helps organize personal health information and routines. It does not provide a replacement for professional medical advice, diagnosis, or treatment.",
   },
   {
-    title: "Does Uifry Work Across My Devices?",
-    body: "Your experience stays in sync so you can check balances and make informed decisions wherever your day takes you.",
+    title: "How Does Elio Protect My Information?",
+    body: "Elio is designed around private access, clear controls, and local storage for supported offline information. You remain in control of your saved records.",
   },
   {
-    title: "Can I Customize My Budgeting Intervals?",
-    body: "Choose the cadence that fits your life and adjust categories, limits, and alerts whenever your priorities change.",
+    title: "Can Elio Remind Me About Medications?",
+    body: "Yes. You can save medication schedules and review upcoming doses so important routines remain easier to follow.",
   },
 ];
 
@@ -35,31 +35,40 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState(0);
 
   return (
-    <section id="faq" className="py-20 sm:py-28">
-      <div className="page-shell">
-        <Reveal className="max-w-2xl">
-          <p className="eyebrow">FAQ</p>
-          <h2 className="section-heading uppercase">
-            Frequently Asked Questions
-          </h2>
-        </Reveal>
+      <section
+          id="faq"
+          className="bg-[#F5F5F7] py-20 sm:py-28"
+      >
+        <div className="page-shell">
+          <Reveal className="max-w-2xl">
+            <p className="eyebrow text-[#007AFF]">FAQ</p>
 
-        <div className="mt-12 grid items-start gap-5 md:grid-cols-2">
-          {faqs.map((faq, index) => (
-            <Reveal key={faq.title + index} delay={(index % 2) * 0.08}>
-              <FAQItem
-                title={faq.title}
-                body={faq.body}
-                open={openIndex === index}
-                onToggle={() =>
-                  setOpenIndex((current) => (current === index ? -1 : index))
-                }
-                highlighted={index === 3}
-              />
-            </Reveal>
-          ))}
+            <h2 className="section-heading uppercase text-[#062541]">
+              Frequently Asked Questions
+            </h2>
+          </Reveal>
+
+          <div className="mt-12 grid items-start gap-5 md:grid-cols-2">
+            {faqs.map((faq, index) => (
+                <Reveal
+                    key={`${faq.title}-${index}`}
+                    delay={(index % 2) * 0.08}
+                >
+                  <FAQItem
+                      title={faq.title}
+                      body={faq.body}
+                      open={openIndex === index}
+                      onToggle={() =>
+                          setOpenIndex((current) =>
+                              current === index ? -1 : index,
+                          )
+                      }
+                      highlighted={index === 3}
+                  />
+                </Reveal>
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
   );
 }
