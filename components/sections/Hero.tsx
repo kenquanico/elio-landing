@@ -1443,7 +1443,7 @@ export default function Hero() {
                             height={58}
                             priority
                             draggable={false}
-                            className="mt-[1px] h-[38px] w-auto shrink-0 select-none object-contain sm:h-[48px] lg:h-[58px]"
+                            className="mt-[1px] h-[38px] w-auto sm:h-[58px] lg:h-[58px]"
                         />
 
                         <h1
