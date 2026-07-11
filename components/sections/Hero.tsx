@@ -8,7 +8,6 @@ import {
     useReducedMotion,
     type Variants,
 } from "framer-motion";
-import WaitlistModal from "./Waitlist"; // adjust path to match your project
 import {
     CalendarClock,
     ChevronLeft,
@@ -25,6 +24,7 @@ import {
     WifiOff,
     type LucideIcon,
 } from "lucide-react";
+import WaitlistModal from "./Waitlist";
 
 type HeroView = "features" | "explore" | "detail";
 
@@ -1439,7 +1439,7 @@ export default function Hero() {
                         <Image
                             src="/elio-land.svg"
                             alt="Elio"
-                            width={220}
+                            width={58}
                             height={58}
                             priority
                             draggable={false}
@@ -1454,9 +1454,7 @@ export default function Hero() {
                         </h1>
                     </motion.div>
 
-                    <motion.button
-                        type="button"
-                        onClick={toggleView}
+                    <motion.div
                         initial={
                             reduceMotion
                                 ? false
@@ -1480,62 +1478,76 @@ export default function Hero() {
                             delay: reduceMotion ? 0 : 0.28,
                             ease: INTRO_EASE,
                         }}
-                        className="hidden shrink-0 items-center gap-1 bg-transparent p-0 pb-2 text-[17px] font-medium text-[#0066cc] transition-colors duration-300 hover:text-[#004f9e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071e3] focus-visible:ring-offset-4 focus-visible:ring-offset-[#f5f5f7] sm:inline-flex"
+                        className="hidden shrink-0 items-center gap-5 pb-2 sm:flex"
                     >
-                        <AnimatePresence mode="wait" initial={false}>
-                            <motion.span
-                                key={view}
-                                initial={
-                                    reduceMotion
-                                        ? false
-                                        : {
-                                            opacity: 0,
-                                            y: 5,
-                                            filter: "blur(6px)",
-                                        }
-                                }
-                                animate={{
-                                    opacity: 1,
-                                    y: 0,
-                                    filter: "blur(0px)",
-                                }}
-                                exit={
-                                    reduceMotion
-                                        ? undefined
-                                        : {
-                                            opacity: 0,
-                                            y: -4,
-                                            filter: "blur(6px)",
-                                        }
-                                }
-                                transition={{
-                                    duration: reduceMotion ? 0 : 0.28,
-                                    ease: SOFT_EASE,
-                                }}
-                            >
-                                {view === "features"
-                                    ? "Explore Elio"
-                                    : "Back to features"}
-                            </motion.span>
-                        </AnimatePresence>
-
-                        <motion.span
-                            aria-hidden="true"
-                            animate={{
-                                rotate: view === "features" ? 0 : 180,
-                            }}
-                            transition={{
-                                duration: reduceMotion ? 0 : 0.42,
-                                ease: INTRO_EASE,
-                            }}
-                            className="text-[24px] leading-none"
+                        <button
+                            type="button"
+                            onClick={toggleView}
+                            className="inline-flex items-center gap-1 bg-transparent p-0 text-[17px] font-medium text-[#0066cc] transition-colors duration-300 hover:text-[#004f9e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071e3] focus-visible:ring-offset-4 focus-visible:ring-offset-[#f5f5f7]"
                         >
-                            ›
-                        </motion.span>
-                    </motion.button>
+                            <AnimatePresence mode="wait" initial={false}>
+                                <motion.span
+                                    key={view}
+                                    initial={
+                                        reduceMotion
+                                            ? false
+                                            : {
+                                                opacity: 0,
+                                                y: 5,
+                                                filter: "blur(6px)",
+                                            }
+                                    }
+                                    animate={{
+                                        opacity: 1,
+                                        y: 0,
+                                        filter: "blur(0px)",
+                                    }}
+                                    exit={
+                                        reduceMotion
+                                            ? undefined
+                                            : {
+                                                opacity: 0,
+                                                y: -4,
+                                                filter: "blur(6px)",
+                                            }
+                                    }
+                                    transition={{
+                                        duration: reduceMotion ? 0 : 0.28,
+                                        ease: SOFT_EASE,
+                                    }}
+                                >
+                                    {view === "features"
+                                        ? "Explore Elio"
+                                        : "Back to features"}
+                                </motion.span>
+                            </AnimatePresence>
+
+                            <motion.span
+                                aria-hidden="true"
+                                animate={{
+                                    rotate: view === "features" ? 0 : 180,
+                                }}
+                                transition={{
+                                    duration: reduceMotion ? 0 : 0.42,
+                                    ease: INTRO_EASE,
+                                }}
+                                className="text-[24px] leading-none"
+                            >
+                                ›
+                            </motion.span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setIsWaitlistOpen(true)}
+                            className="inline-flex h-11 items-center rounded-full bg-black px-6 text-[15px] font-semibold text-white transition-colors duration-300 hover:bg-black/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071e3] focus-visible:ring-offset-2 focus-visible:ring-offset-[#f5f5f7]"
+                        >
+                            Join waitlist
+                        </button>
+                    </motion.div>
                 </div>
 
-                <div className="mb-7 sm:hidden">
+                <div className="mb-7 flex items-center gap-4 sm:hidden">
                     <button
                         type="button"
                         onClick={toggleView}
@@ -1558,6 +1570,14 @@ export default function Hero() {
                         >
                             ›
                         </motion.span>
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => setIsWaitlistOpen(true)}
+                        className="ml-auto inline-flex h-10 items-center rounded-full bg-black px-5 text-[14px] font-semibold text-white transition-colors duration-300 hover:bg-black/85"
+                    >
+                        Join waitlist
                     </button>
                 </div>
 
@@ -1734,6 +1754,11 @@ export default function Hero() {
                     </AnimatePresence>
                 </motion.div>
             </div>
+
+            <WaitlistModal
+                open={isWaitlistOpen}
+                onClose={() => setIsWaitlistOpen(false)}
+            />
         </motion.section>
     );
 }
