@@ -8,6 +8,7 @@ import {
     useReducedMotion,
     type Variants,
 } from "framer-motion";
+import WaitlistModal from "./Waitlist"; // adjust path to match your project
 import {
     CalendarClock,
     ChevronLeft,
@@ -1301,6 +1302,7 @@ export default function Hero() {
     const [selectedFeatureId, setSelectedFeatureId] = useState(FEATURES[0].id);
     const [exploreRevealKey, setExploreRevealKey] = useState(0);
     const [detailRevealKey, setDetailRevealKey] = useState(0);
+    const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
 
     const selectedFeature =
         FEATURES.find((feature) => feature.id === selectedFeatureId) ?? FEATURES[0];

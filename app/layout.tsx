@@ -14,8 +14,6 @@ const jakarta = Plus_Jakarta_Sans({
     display: "swap",
 });
 
-const iconVersion = "4";
-
 export const metadata: Metadata = {
     title: {
         default: "Elio - Your Offline-First Health Companion",
@@ -30,32 +28,22 @@ export const metadata: Metadata = {
     icons: {
         icon: [
             {
-                url: `/Elio_New.png?v=${iconVersion}`,
+                url: "/elio-icon-v5.png",
                 type: "image/png",
                 sizes: "1024x1024",
             },
-        ],
-
-        shortcut: [
             {
-                url: `/Elio_New.png?v=${iconVersion}`,
+                url: "/elio-icon-v5.png",
                 type: "image/png",
+                sizes: "32x32",
             },
         ],
-
+        shortcut: "/elio-icon-v5.png",
         apple: [
             {
-                url: `/Elio_New.png?v=${iconVersion}`,
+                url: "/elio-icon-v5.png",
                 type: "image/png",
                 sizes: "180x180",
-            },
-        ],
-
-        other: [
-            {
-                rel: "mask-icon",
-                url: "/elio-land.svg",
-                color: "#062541",
             },
         ],
     },
