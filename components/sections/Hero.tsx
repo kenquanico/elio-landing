@@ -36,7 +36,7 @@ type FeatureCard = {
     image: string;
     alt: string;
     exploreId: string;
-    detailBody: string;
+    detailBody: [string, string];
 };
 
 type ExploreTone = "light" | "navy";
@@ -83,8 +83,10 @@ const FEATURES: FeatureCard[] = [
             "/assets/Simulator Screenshot - iPhone 17 - 2026-07-10 at 20.37.21.png",
         alt: "Elio home screen showing the health assistant and daily activity",
         exploreId: "assistant",
-        detailBody:
-            "Elio brings your daily health information into one clear view. You see upcoming medications, recent records, insurance details, and reminders without moving between separate apps or searching through files. The experience stays focused on the information you need for the day.",
+        detailBody: [
+            "Your home view organizes upcoming doses, recent health records, insurance information, reminders, and important updates by priority. Instead of checking several apps or searching through folders, you can quickly understand what needs attention now and what is coming next.",
+            "Elio is designed to make everyday health management feel easier to follow. Clear labels, timely status updates, and connected information help you prepare for appointments, keep routines consistent, and find essential details when you or someone supporting your care needs them.",
+        ],
     },
     {
         id: "medications",
@@ -95,8 +97,10 @@ const FEATURES: FeatureCard[] = [
             "/assets/Simulator Screenshot - iPhone 17 - 2026-07-10 at 22.24.36.png",
         alt: "Elio medications screen showing medication schedules and status",
         exploreId: "medications",
-        detailBody:
-            "Create a medication routine with the medicine name, dose, time, and instructions. Elio keeps each schedule easy to review and shows whether a dose is upcoming or completed, so your daily routine remains clear and consistent.",
+        detailBody: [
+            "Each medication can include its name, dosage, schedule, purpose, and instructions, giving you a complete reference whenever you need it. Daily status indicators make it easy to distinguish upcoming, due, and completed doses without reading through a complicated list.",
+            "By keeping the full routine in one place, Elio helps reduce uncertainty around what to take and when to take it. You can review the day ahead, confirm completed doses, and carry accurate medication details into a consultation or conversation with a caregiver.",
+        ],
     },
     {
         id: "vault",
@@ -107,8 +111,10 @@ const FEATURES: FeatureCard[] = [
             "/assets/Simulator Screenshot - iPhone 17 - 2026-07-10 at 22.24.19.png",
         alt: "Elio health vault screen showing saved health records",
         exploreId: "vault",
-        detailBody:
-            "The Health Vault keeps prescriptions, laboratory results, medical certificates, and other personal records together. Your files remain organized by type and date, which makes them easier to find during appointments, emergencies, or insurance requests.",
+        detailBody: [
+            "The Health Vault keeps prescriptions, laboratory results, medical certificates, imaging reports, and other personal records together. Files are organized by type and date, so you can identify the correct document without opening every file or searching across different devices.",
+            "Having a dependable record library makes appointments, emergencies, follow-up care, and insurance requests easier to handle. You can quickly locate the information being requested and keep a clearer history of documents that may be useful for future decisions.",
+        ],
     },
     {
         id: "insurance",
@@ -119,8 +125,10 @@ const FEATURES: FeatureCard[] = [
             "/assets/Simulator Screenshot - iPhone 17 - 2026-07-10 at 22.32.58.png",
         alt: "Elio insurance screen showing coverage and deductible information",
         exploreId: "insurance",
-        detailBody:
-            "Keep PhilHealth, private health coverage, and life insurance details in one place. Elio presents your digital cards, policy information, deductible progress, and remaining balance in a format you can review quickly when you need to understand your coverage.",
+        detailBody: [
+            "Keep PhilHealth, private health coverage, and life insurance information in one organized view. Elio presents digital cards, member and policy details, deductible progress, covered amounts, and remaining balances in a format that is quick to scan and easier to understand.",
+            "When arranging care or reviewing a claim, you can refer to the details that matter without searching through emails, paper cards, or separate provider portals. This gives you a clearer picture of your available coverage before making health-related decisions.",
+        ],
     },
     {
         id: "elio-ai",
@@ -131,8 +139,10 @@ const FEATURES: FeatureCard[] = [
             "/assets/Simulator Screenshot - iPhone 17 - 2026-07-10 at 22.36.44.png",
         alt: "ElioAI assistant completing health and insurance actions",
         exploreId: "assistant",
-        detailBody:
-            "ElioAI helps you find information and complete common health tasks through a simple conversation. Ask about your next medication, check saved insurance details, review a recent record, or update information while keeping the rest of the app connected to the same request.",
+        detailBody: [
+            "Use a simple conversation to ask about your next medication, review saved insurance details, locate a recent record, or understand what is scheduled for the day. ElioAI draws from the information already organized in Elio, helping you reach the right detail with fewer steps.",
+            "The assistant can also guide common actions such as updating health information, saving a record, or checking an existing routine. Responses stay connected to the same request, so you can move from a question to the relevant task without navigating through several screens.",
+        ],
     },
 ];
 
@@ -978,21 +988,15 @@ function FeatureDetail({ feature, reduceMotion }: FeatureDetailProps) {
                 }}
                 className="mx-auto max-w-[660px] lg:mx-0 lg:pr-8"
             >
-                <p className="text-[15px] font-semibold leading-none text-[#0066cc] sm:text-[16px]">
-                    {feature.topic}
-                </p>
+                <div className="max-w-[650px] space-y-5 text-[17px] leading-[1.72] tracking-[-0.01em] text-[#454549] sm:text-[19px]">
+                    <p className="font-medium text-[#252528]">
+                        {feature.topic}. {feature.headline} {feature.body}
+                    </p>
 
-                <h2 className="mt-5 max-w-[650px] font-display text-[38px] font-semibold leading-[1.02] tracking-[-0.048em] text-[#1d1d1f] sm:text-[48px] lg:text-[58px] xl:text-[64px]">
-                    {feature.headline}
-                </h2>
-
-                <p className="mt-7 max-w-[620px] text-[19px] font-medium leading-[1.5] tracking-[-0.012em] text-[#353538] sm:text-[21px]">
-                    {feature.body}
-                </p>
-
-                <p className="mt-5 max-w-[620px] text-[17px] leading-[1.7] text-[#5f6065] sm:text-[18px]">
-                    {feature.detailBody}
-                </p>
+                    {feature.detailBody.map((paragraph) => (
+                        <p key={paragraph}>{paragraph}</p>
+                    ))}
+                </div>
             </motion.div>
         </div>
     );
@@ -1000,9 +1004,11 @@ function FeatureDetail({ feature, reduceMotion }: FeatureDetailProps) {
 
 function FeatureCarousel({ onExplore }: FeatureCarouselProps) {
     const scrollerRef = useRef<HTMLUListElement>(null);
+    const scrollAnimationRef = useRef<number | null>(null);
+    const scrollTargetIndexRef = useRef(0);
+    const isArrowScrollingRef = useRef(false);
     const reduceMotion = useReducedMotion() ?? false;
 
-    const [activeCardIndex, setActiveCardIndex] = useState(0);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
     const [canScrollRight, setCanScrollRight] = useState(true);
 
@@ -1041,7 +1047,9 @@ function FeatureCarousel({ onExplore }: FeatureCarouselProps) {
             }
         });
 
-        setActiveCardIndex(closestIndex);
+        if (!isArrowScrollingRef.current) {
+            scrollTargetIndexRef.current = closestIndex;
+        }
     }, []);
 
     useEffect(() => {
@@ -1071,6 +1079,12 @@ function FeatureCarousel({ onExplore }: FeatureCarouselProps) {
 
         return () => {
             cancelAnimationFrame(frame);
+
+            if (scrollAnimationRef.current !== null) {
+                cancelAnimationFrame(scrollAnimationRef.current);
+            }
+
+            scroller.style.removeProperty("scroll-snap-type");
             scroller.removeEventListener("scroll", scheduleUpdate);
             window.removeEventListener("resize", scheduleUpdate);
             resizeObserver.disconnect();
@@ -1085,22 +1099,64 @@ function FeatureCarousel({ onExplore }: FeatureCarouselProps) {
                 return;
             }
 
-            const firstCard = scroller.querySelector<HTMLElement>(
-                "[data-feature-card]",
+            const cards = Array.from(
+                scroller.querySelectorAll<HTMLElement>(
+                    "[data-feature-card]",
+                ),
             );
 
-            if (!firstCard) {
+            if (cards.length === 0) {
                 return;
             }
 
-            const gap = Number.parseFloat(
-                window.getComputedStyle(scroller).columnGap || "0",
+            const targetIndex = Math.min(
+                Math.max(
+                    scrollTargetIndexRef.current + direction,
+                    0,
+                ),
+                cards.length - 1,
             );
+            const targetLeft = cards[targetIndex].offsetLeft;
 
-            scroller.scrollBy({
-                left: direction * (firstCard.offsetWidth + gap),
-                behavior: reduceMotion ? "auto" : "smooth",
-            });
+            scrollTargetIndexRef.current = targetIndex;
+
+            if (scrollAnimationRef.current !== null) {
+                cancelAnimationFrame(scrollAnimationRef.current);
+            }
+
+            if (reduceMotion) {
+                scroller.scrollLeft = targetLeft;
+                return;
+            }
+
+            const startLeft = scroller.scrollLeft;
+            const distance = targetLeft - startLeft;
+            const duration = 720;
+            const startedAt = performance.now();
+
+            isArrowScrollingRef.current = true;
+            scroller.style.scrollSnapType = "none";
+
+            const animateScroll = (now: number) => {
+                const progress = Math.min((now - startedAt) / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 4);
+
+                scroller.scrollLeft = startLeft + distance * eased;
+
+                if (progress < 1) {
+                    scrollAnimationRef.current = requestAnimationFrame(
+                        animateScroll,
+                    );
+                    return;
+                }
+
+                scroller.scrollLeft = targetLeft;
+                scroller.style.removeProperty("scroll-snap-type");
+                isArrowScrollingRef.current = false;
+                scrollAnimationRef.current = null;
+            };
+
+            scrollAnimationRef.current = requestAnimationFrame(animateScroll);
         },
         [reduceMotion],
     );
@@ -1159,11 +1215,7 @@ function FeatureCarousel({ onExplore }: FeatureCarouselProps) {
                             className="h-[600px] w-[86vw] max-w-[420px] shrink-0 snap-start sm:h-[630px] sm:w-[400px] lg:h-[660px] lg:w-[420px]"
                         >
                             <article
-                                className={`group relative grid h-full grid-rows-[296px_304px] overflow-hidden rounded-[30px] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.025)] transition-[transform,opacity,box-shadow] duration-[850ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:shadow-[0_16px_45px_-30px_rgba(0,0,0,0.28)] sm:grid-rows-[304px_326px] lg:grid-rows-[312px_348px] ${
-                                    index === activeCardIndex
-                                        ? "translate-y-0 scale-100 opacity-100"
-                                        : "translate-y-[2px] scale-[0.992] opacity-[0.965]"
-                                }`}
+                                className="group relative grid h-full grid-rows-[296px_304px] overflow-hidden rounded-[30px] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.025)] transition-[transform,box-shadow] duration-[850ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:shadow-[0_16px_45px_-30px_rgba(0,0,0,0.28)] sm:grid-rows-[304px_326px] lg:grid-rows-[312px_348px]"
                             >
                                 <div className="relative z-10 px-7 pt-8 sm:px-8 sm:pt-9">
                                     <p className="text-[15px] font-semibold leading-none text-[#1d1d1f]">
@@ -1335,6 +1387,7 @@ export default function Hero() {
     }, [showExplore, showFeatures, view]);
 
     return (
+        <>
         <motion.section
             id="home"
             aria-labelledby="elio-features-heading"
@@ -1407,7 +1460,10 @@ export default function Hero() {
             />
 
             <div className="relative z-10 mx-auto max-w-[1600px] px-5 sm:px-8 lg:px-12">
-                <div className="mb-10 flex items-end justify-between gap-7 sm:mb-12 lg:mb-14">
+                <nav
+                    aria-label="Elio primary"
+                    className="mb-9 flex items-center justify-between gap-5 border-b border-black/[0.07] pb-5 sm:mb-11 sm:pb-6"
+                >
                     <motion.div
                         initial={
                             reduceMotion
@@ -1434,7 +1490,7 @@ export default function Hero() {
                             delay: reduceMotion ? 0 : 0.12,
                             ease: INTRO_EASE,
                         }}
-                        className="flex min-w-0 items-start gap-4 sm:gap-5 lg:gap-6"
+                        className="shrink-0"
                     >
                         <Image
                             src="/elio-land.svg"
@@ -1443,16 +1499,74 @@ export default function Hero() {
                             height={58}
                             priority
                             draggable={false}
-                            className="mt-[1px] h-[38px] w-auto sm:h-[58px] lg:h-[58px]"
+                            className="h-[38px] w-auto sm:h-[48px]"
                         />
-
-                        <h1
-                            id="elio-features-heading"
-                            className="max-w-[760px] min-w-0 font-display text-[38px] font-semibold leading-[1.04] tracking-[-0.045em] text-[#1d1d1f] sm:text-[48px] lg:text-[58px]"
-                        >
-                            Why Elio makes managing your health easier.
-                        </h1>
                     </motion.div>
+
+                    <motion.button
+                        type="button"
+                        onClick={() => setIsWaitlistOpen(true)}
+                        initial={
+                            reduceMotion
+                                ? false
+                                : {
+                                    opacity: 0,
+                                    x: 18,
+                                    filter: "blur(14px)",
+                                }
+                        }
+                        whileInView={{
+                            opacity: 1,
+                            x: 0,
+                            filter: "blur(0px)",
+                        }}
+                        viewport={{
+                            once: true,
+                            amount: 0.3,
+                        }}
+                        transition={{
+                            duration: reduceMotion ? 0 : 1.25,
+                            delay: reduceMotion ? 0 : 0.28,
+                            ease: INTRO_EASE,
+                        }}
+                        className="inline-flex h-10 shrink-0 items-center rounded-full bg-black px-5 text-[14px] font-semibold text-white transition-colors duration-300 hover:bg-black/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071e3] focus-visible:ring-offset-2 focus-visible:ring-offset-[#f5f5f7] sm:h-11 sm:px-6 sm:text-[15px]"
+                    >
+                        Join waitlist
+                    </motion.button>
+                </nav>
+
+                <div className="mb-10 flex flex-col items-start gap-5 sm:mb-12 sm:flex-row sm:items-end sm:justify-between sm:gap-7 lg:mb-14">
+                    <motion.h1
+                        id="elio-features-heading"
+                        initial={
+                            reduceMotion
+                                ? false
+                                : {
+                                    opacity: 0,
+                                    y: 30,
+                                    scale: 0.975,
+                                    filter: "blur(22px)",
+                                }
+                        }
+                        whileInView={{
+                            opacity: 1,
+                            y: 0,
+                            scale: 1,
+                            filter: "blur(0px)",
+                        }}
+                        viewport={{
+                            once: true,
+                            amount: 0.3,
+                        }}
+                        transition={{
+                            duration: reduceMotion ? 0 : 1.45,
+                            delay: reduceMotion ? 0 : 0.12,
+                            ease: INTRO_EASE,
+                        }}
+                        className="max-w-[760px] min-w-0 font-display text-[38px] font-semibold leading-[1.04] tracking-[-0.045em] text-[#1d1d1f] sm:text-[48px] lg:text-[58px]"
+                    >
+                        Why Elio makes managing your health easier.
+                    </motion.h1>
 
                     <motion.div
                         initial={
@@ -1478,12 +1592,12 @@ export default function Hero() {
                             delay: reduceMotion ? 0 : 0.28,
                             ease: INTRO_EASE,
                         }}
-                        className="hidden shrink-0 items-center gap-5 pb-2 sm:flex"
+                        className="shrink-0 pb-1 sm:pb-2"
                     >
                         <button
                             type="button"
                             onClick={toggleView}
-                            className="inline-flex items-center gap-1 bg-transparent p-0 text-[17px] font-medium text-[#0066cc] transition-colors duration-300 hover:text-[#004f9e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071e3] focus-visible:ring-offset-4 focus-visible:ring-offset-[#f5f5f7]"
+                            className="inline-flex items-center gap-1 bg-transparent p-0 text-[16px] font-medium text-[#0066cc] transition-colors duration-300 hover:text-[#004f9e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071e3] focus-visible:ring-offset-4 focus-visible:ring-offset-[#f5f5f7] sm:text-[17px]"
                         >
                             <AnimatePresence mode="wait" initial={false}>
                                 <motion.span
@@ -1536,49 +1650,7 @@ export default function Hero() {
                                 ›
                             </motion.span>
                         </button>
-
-                        <button
-                            type="button"
-                            onClick={() => setIsWaitlistOpen(true)}
-                            className="inline-flex h-11 items-center rounded-full bg-black px-6 text-[15px] font-semibold text-white transition-colors duration-300 hover:bg-black/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071e3] focus-visible:ring-offset-2 focus-visible:ring-offset-[#f5f5f7]"
-                        >
-                            Join waitlist
-                        </button>
                     </motion.div>
-                </div>
-
-                <div className="mb-7 flex items-center gap-4 sm:hidden">
-                    <button
-                        type="button"
-                        onClick={toggleView}
-                        className="inline-flex items-center gap-1 bg-transparent p-0 text-[16px] font-medium text-[#0066cc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0071e3]"
-                    >
-                        {view === "features"
-                            ? "Explore Elio"
-                            : "Back to features"}
-
-                        <motion.span
-                            aria-hidden="true"
-                            animate={{
-                                rotate: view === "features" ? 0 : 180,
-                            }}
-                            transition={{
-                                duration: reduceMotion ? 0 : 0.42,
-                                ease: INTRO_EASE,
-                            }}
-                            className="text-[23px] leading-none"
-                        >
-                            ›
-                        </motion.span>
-                    </button>
-
-                    <button
-                        type="button"
-                        onClick={() => setIsWaitlistOpen(true)}
-                        className="ml-auto inline-flex h-10 items-center rounded-full bg-black px-5 text-[14px] font-semibold text-white transition-colors duration-300 hover:bg-black/85"
-                    >
-                        Join waitlist
-                    </button>
                 </div>
 
                 <motion.div
@@ -1755,10 +1827,12 @@ export default function Hero() {
                 </motion.div>
             </div>
 
-            <WaitlistModal
-                open={isWaitlistOpen}
-                onClose={() => setIsWaitlistOpen(false)}
-            />
         </motion.section>
+
+        <WaitlistModal
+            open={isWaitlistOpen}
+            onClose={() => setIsWaitlistOpen(false)}
+        />
+        </>
     );
 }
