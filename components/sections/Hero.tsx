@@ -1493,7 +1493,7 @@ export default function Hero() {
                         className="shrink-0"
                     >
                         <Image
-                            src="/elio-land.svg"
+                            src="/elio-icon-v5.png"
                             alt="Elio"
                             width={58}
                             height={58}
