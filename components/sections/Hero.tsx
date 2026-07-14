@@ -1241,7 +1241,7 @@ function FeatureCarousel({ onExplore }: FeatureCarouselProps) {
                                             unoptimized
                                             quality={100}
                                             draggable={false}
-                                            sizes="(max-width: 639px) 280px, (max-width: 1023px) 300px, 320px"
+                                            sizes="(max-width: 739px) 280px, (max-width: 923px) 300px, 320px"
                                             className="select-none object-cover object-top transition-transform duration-[1300ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.008]"
                                         />
                                     </div>
@@ -1430,7 +1430,7 @@ export default function Hero() {
                     ease: INTRO_EASE,
                 },
             }}
-            className="relative overflow-hidden bg-[#f5f5f7] py-14 sm:py-[72px] lg:py-24"
+            className="relative overflow-hidden bg-[#f5f5f7] py-14 sm:py-[52px] lg:py-14"
         >
             <motion.div
                 aria-hidden="true"
@@ -1456,7 +1456,7 @@ export default function Hero() {
                     duration: reduceMotion ? 0 : 2.3,
                     ease: INTRO_EASE,
                 }}
-                className="pointer-events-none absolute left-1/2 top-[-120px] h-[460px] w-[82vw] max-w-[1180px] -translate-x-1/2 rounded-full bg-white/85"
+                className="pointer-events-none absolute left-1/2 top-[-60px] h-[460px] w-[82vw] max-w-[1180px] -translate-x-1/2 rounded-full bg-white/85"
             />
 
             <div className="relative z-10 mx-auto max-w-[1600px] px-5 sm:px-8 lg:px-12">
